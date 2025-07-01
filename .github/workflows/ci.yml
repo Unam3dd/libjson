@@ -1,0 +1,135 @@
+name: Pipeline CI/CD
+
+permissions:
+  contents: read
+
+on:
+  push:
+  pull_request:
+
+jobs:
+
+  lint:
+    runs-on: ubuntu-latest
+    container:
+      image: 'sam0verfl0w/mydebian:latest'
+
+    steps:
+
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Installing clang-tidy
+        run: |
+          apt-get update
+          apt-get install clang-tidy clang-tidy-19 -y
+
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            build/
+            subprojects/
+          key: ${{ runner.os }}-liboftp
+
+      - name: Run clang-tidy
+        run: |
+          meson setup --reconfigure build --buildtype=debug
+          run-clang-tidy -clang-tidy-binary=/usr/bin/clang-tidy-19 -p build -quiet
+
+  build:
+    runs-on: ubuntu-latest
+
+    needs: lint
+
+    container:
+      image: 'sam0verfl0w/mydebian:latest'
+
+    steps:
+
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            build/
+            subprojects/
+          key: ${{ runner.os }}-liboftp
+
+      - name: build-debug
+        run: |
+          meson setup --reconfigure build --buildtype=debug
+          meson compile -C build
+          meson compile -C build --clean
+
+      - name: build-default
+        run: |
+          meson setup --reconfigure build
+          meson compile -C build
+          meson compile -C build --clean
+
+      - name: build-plain
+        if: github.ref == 'refs/heads/main'
+        run: |
+          meson setup --reconfigure build --buildtype=plain
+          meson compile -C build
+          meson compile -C build --clean
+
+      - name: build-debug-optimized
+        if: github.ref == 'refs/heads/main'
+        run: |
+          meson setup --reconfigure build --buildtype=debugoptimized
+          meson compile -C build
+          meson compile -C build --clean
+
+      - name: build-minsize
+        if: github.ref == 'refs/heads/main'
+        run: |
+          meson setup --reconfigure build --buildtype=minsize
+          meson compile -C build
+          meson compile -C build --clean
+
+      - name: build-release
+        run: |
+          meson setup --reconfigure build --buildtype=release
+          meson compile -C build
+          meson compile -C build --clean
+
+
+  test:
+    runs-on: ubuntu-latest
+
+    needs: build
+
+    container:
+      image: 'sam0verfl0w/mydebian:latest'
+
+    steps:
+
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            build/
+            subprojects/
+          key: ${{ runner.os }}-liboftp
+
+      - name: Test
+        run: |
+          meson setup --reconfigure build --buildtype=debug
+          meson compile -C build
+          meson test -C build
+          meson compile -C build --clean
+
+      - name: Test (Verbose)
+        run: |
+          meson setup --reconfigure build --buildtype=debug
+          meson compile -C build
+          meson test -C build --verbose
+          meson compile -C build --clean
+

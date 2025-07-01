@@ -1,0 +1,7 @@
+test:
+  stage: test
+  script:
+    - meson setup --reconfigure build --buildtype=debug
+    - meson compile -C build
+    - meson test -C build
+    - meson compile -C build --clean

@@ -1,0 +1,9 @@
+lint:
+  stage: lint
+  before_script:
+    - echo "Installing clang tools..."
+    - apt-get update && apt-get install clang-tidy clang-tidy-19 -y
+  script:
+    - echo "Runing clang-tidy..."
+    - meson setup --reconfigure build --buildtype=debug
+    - run-clang-tidy -clang-tidy-binary=/usr/bin/clang-tidy-19 -p build -quiet

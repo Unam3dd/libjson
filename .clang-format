@@ -1,0 +1,62 @@
+---
+BasedOnStyle: LLVM
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+---
+Language: Cpp
+
+AlignConsecutiveAssignments:
+  Enabled: true
+AlignConsecutiveBitFields:
+  Enabled: true
+
+AlignAfterOpenBracket: Align
+AlignOperands: true
+AlignTrailingComments: true
+AllowShortFunctionsOnASingleLine: All
+
+ColumnLimit: 120
+DerivePointerAlignment: false
+PointerAlignment: Right
+InsertBraces: false
+#BreakBeforeBraces: Allman
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterFunction: true
+  AfterEnum: false
+  AfterStruct: true
+  SplitEmptyFunction: true
+BreakBeforeTernaryOperators: true
+#BreakBinaryOperations: Never
+#BreakFunctionDefinitionParameters: false
+BreakStringLiterals: true
+QualifierAlignment: Left
+#QualifierOrder: [static, inline, const, volatile, type]
+ReferenceAlignment: Right
+ReflowComments: true
+RemoveBracesLLVM: true
+RemoveSemicolon: false
+SeparateDefinitionBlocks: Always
+SortIncludes: Never
+SpaceAfterCStyleCast: false
+SpaceAfterLogicalNot: false
+SpaceAroundPointerQualifiers: Default
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeCaseColon: false
+SpaceBeforeParens: Custom
+SpaceBeforeParensOptions:
+  AfterControlStatements: true
+  AfterFunctionDefinitionName: false
+  AfterFunctionDeclarationName: false
+  AfterIfMacros: false
+  BeforeNonEmptyParentheses: false
+SpaceBeforeRangeBasedForLoopColon: true
+SpaceBeforeSquareBrackets: false
+SpaceInEmptyBlock: false
+SpaceInEmptyParentheses: false
+SpacesInCStyleCastParentheses: false
+#InConditionalStatements: false
+#InEmptyParentheses: false
+SpacesInSquareBrackets: false
+...

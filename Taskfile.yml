@@ -1,0 +1,150 @@
+version: '3'
+
+tasks:
+  
+  help:
+    platforms: [linux/amd64]
+    aliases: [h]
+    cmds:
+      - task -a
+    silent: true
+    desc: "show this pages"
+  
+  default:
+    - task: help
+
+  init:
+    platforms: [linux/amd64]
+    aliases: [submodule-init, sinit, submodule]
+    preconditions:
+      - sh: "which git"
+        msg: "git is not installed on this machine !"
+    cmds:
+      - git submodule update --remote
+      - git submodule update --init
+    silent: true
+    desc: "Update and init submodule from git repository !"
+
+  build-containers:
+    platforms: [linux/amd64]
+    aliases: [build-c, bc]
+    preconditions:
+      - sh: 'test -d deploy'
+        msg: "'deploy' folder missing !"
+      - sh: 'which docker'
+        msg: "docker is not installed on this machine !"
+    cmds:
+      - docker build -t liboftp:latest .
+    silent: true
+    desc: "Install docker images (necessary to build ftmaster binaries)"
+
+  list-containers:
+    platforms: [linux/amd64]
+    aliases: [list-c, lc, lstc, lst-containers]
+    preconditions:
+      - sh: "which docker"
+        msg: "docker is not installed on this machine !"
+    cmds:
+      - docker image ls --filter "reference=liboftp*"
+    silent: true
+    desc: "List liboftp docker images installed"
+
+  remove-containers:
+    platforms: [linux/amd64]
+    aliases: [remove-c, rc, rmc]
+    preconditions:
+      - sh: "which docker"
+        msg: "docker is not installed on this machine !"
+    cmds:
+      - docker image rm --filter "reference=liboftp*"
+    silent: true
+    desc: "Remove liboftp docker images installed"
+
+  update:
+    platforms: [linux/amd64]
+    aliases: [pull, fetch, fetch-origin, pull-fetch-origin]
+    preconditions:
+      - sh: "which git"
+        msg: "git is not installed on this machine !"
+    cmds:
+      - defer: { task: init }
+      - git fetch origin
+      - git pull
+    silent: true
+    desc: "pull last changes"
+
+  list-branch:
+    platforms: [linux/amd64]
+    aliases: [branch]
+    preconditions:
+      - sh: "which git"
+        msg: "git is not installed on this machine !"
+    cmds:
+      - echo -e "[\033[32m+\033[00m] Fetching latest branchs..."
+      - git fetch origin
+      - echo -e "[\033[32m+\033[00m] branchs list :\n\033[32mBRANCH\033[33m\t COMMIT\033[34m\t  DESCRIPTION\033[00m"
+      - git branch -v | /bin/cat
+    silent: true
+    desc: "list local git branch"
+
+  version:
+    platforms: [linux/amd64]
+    aliases: [v, vrs, ftmaster-version ftmaster-v, version-ftmaster, ftm-version, ftmv, ftmasterv]
+    preconditions:
+      - sh: "which git"
+        msg: "git is not installed on this machine !"
+    cmds:
+      - echo -e "[\033[32m+\033[00m] Fetching latest remote tags..."
+      - git fetch origin --tags
+      - echo -e -n "[\033[32m+\033[00m] Latest liboftp version is \033[32m"
+      - git tag -l --sort=-creatordate | head -n 1
+      - echo -e -n "\033[00m"
+    silent: true
+    desc: "get latest version of liboftp from github repository"
+
+  clean-containers:
+    platforms: [linux/amd64]
+    aliases: [clean-c, cc]
+    preconditions:
+      - sh: "which docker"
+        msg: "docker is not insttalled on this machine !"
+    cmds:
+      - docker stop $(docker ps -aq)
+      - docker rm $(docker ps -aq)
+
+  run-container:
+    platforms: [linux/amd64]
+    aliases: [rc, run]
+    preconditions:
+      - sh: "which docker"
+        msg: "docker is not installed on this machine !"
+    cmds:
+      - docker run --hostname nml --mount type=bind,source=$(pwd),target=/tmp/nml -it {{.CLI_ARGS}}
+      - defer: { task: clean-containers }
+    silent: true
+
+  build:
+    platforms: [linux/amd64]
+    preconditions:
+      - sh: "which meson"
+        msg: "meson is not installed on this machine !"
+    cmds:
+      - meson setup --reconfigure build --prefix=$(pwd)/dist
+      - meson compile -C build
+      - meson install -C build
+    silent: true
+    desc: "Build the project in release mode"
+
+  build-dev:
+    platforms: [linux/amd64]
+    preconditions:
+      - sh: "which meson"
+        msg: "meson is not installed on this machine !"
+    cmds:
+      - meson setup build --reconfigure --buildtype=debug --prefix=$(pwd)/dist
+      - meson compile -C build
+      - meson install -C build
+    silent: true
+    desc: "Build liboftp in debug version !"
+
+

@@ -1,0 +1,55 @@
+build-debug:
+  stage:
+    build
+  script:
+    - meson setup --reconfigure build --buildtype=debug
+    - meson compile -C build
+    - meson compile -C build --clean
+
+build-default:
+  stage:
+    build
+  script:
+    - meson setup --reconfigure build
+    - meson compile -C build
+    - meson compile -C build --clean
+
+build-plain:
+  stage:
+    build
+  script:
+    - meson setup --reconfigure build --buildtype=plain
+    - meson compile -C build
+    - meson compile -C build --clean
+  only:
+    - main
+
+build-debugoptimized:
+  stage:
+    build
+  script:
+    - meson setup --reconfigure build --buildtype=debugoptimized
+    - meson compile -C build
+    - meson compile -C build --clean
+  only:
+    - main
+
+build-minsize:
+  stage:
+    build
+  script:
+    - meson setup --reconfigure build --buildtype=minsize
+    - meson compile -C build
+    - meson compile -C build --clean
+  only:
+    - main
+
+build-release:
+  stage:
+    build
+  script:
+    - meson setup --reconfigure build --buildtype=release
+    - meson compile -C build
+    - meson compile -C build --clean
+  only:
+    - main

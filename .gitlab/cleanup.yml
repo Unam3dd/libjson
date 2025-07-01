@@ -1,0 +1,6 @@
+cleanup:
+  stage: cleanup
+  script:
+    - echo "Cleaning up"
+    - rm -rf /tmp/*
+  when: always
