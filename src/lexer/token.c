@@ -14,9 +14,9 @@
 //
 //////////////////////////////////////
 
-static inline json_bool_t	token_is_string(const char *str, size_t *pos)
+static inline json_bool_t	token_is_string(const char *str)
 {
-	if (!str || !pos) return (FALSE);
+	if (!str) return (FALSE);
 	
 	char	*tmp = NULL;
 
@@ -28,7 +28,7 @@ static inline json_bool_t	token_is_string(const char *str, size_t *pos)
 	if (!tmp)
 		return (FALSE);
 
-	*pos = *pos + (tmp - str) + 1;
+	//*pos = *pos + (tmp - str) + 1;
 
 	return (TRUE);
 }
@@ -72,7 +72,7 @@ token_type_t	next_token(lexer_t *lexer)
 			break;
 	}
 
-	if (token_is_string((const char *)(lexer->buf + lexer->pos), &lexer->pos))
+	if (token_is_string((const char *)(lexer->buf + lexer->pos)))
 		return (TOKEN_STRING);
 	
 	return (TOKEN_ERR);
