@@ -1,0 +1,26 @@
+{
+  "user": {
+    "id": 12345,
+    "name": "Maily",
+    "active": true,
+    "balance": 1050.75,
+    "preferences": {
+      "notifications": false,
+      "theme": "dark"
+    }
+  },
+  "tags": ["c", "json", "parser", "fsm", "ast"],
+  "projects": [
+    {
+      "name": "json-parser",
+      "stars": 42,
+      "archived": false
+    },
+    {
+      "name": "ft-master",
+      "stars": 101,
+      "archived": null
+    }
+  ],
+  "notes": null
+}

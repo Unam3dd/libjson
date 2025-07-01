@@ -30,7 +30,7 @@ INC_DIR = ['inc']
 #
 #############################
 
-LIBOFTP_HEADERS = ['libjson.h']
+LIBJSON_HEADERS = ['libjson.h']
 
 STD_HEADERS = ['stdio.h']
 
@@ -42,7 +42,11 @@ STD_HEADERS = ['stdio.h']
 
 SRCS_VERSION = ['src/version/version.c']
 
-SRCS_FILES = files(SRCS_VERSION)
+SRCS_UTILS = ['src/utils/file.c']
+
+SRCS_LEXER = ['src/lexer/token.c']
+
+SRCS_FILES = files(SRCS_VERSION, SRCS_UTILS, SRCS_LEXER)
 
 #############################
 #
@@ -187,7 +191,7 @@ ld = find_program('ld', required: true)
 #############################
 
 
-HEADERS = LIBOFTP_HEADERS + STD_HEADERS
+HEADERS = LIBJSON_HEADERS + STD_HEADERS
 
 foreach header: HEADERS
   if cc.has_header(header, include_directories: include_directories('inc'), required: true) == false
