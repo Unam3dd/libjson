@@ -13,4 +13,4 @@ test_version_1 = executable('test_version',
                 install: false,
                 pie: true)
 
-test('test1', test_version_1, verbose: false, suite: ['version'])
+test('test version 1', test_version_1, verbose: false, suite: ['version'])

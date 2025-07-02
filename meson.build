@@ -46,7 +46,11 @@ SRCS_UTILS = ['src/utils/file.c']
 
 SRCS_LEXER = ['src/lexer/token.c']
 
-SRCS_FILES = files(SRCS_VERSION, SRCS_UTILS, SRCS_LEXER)
+SRCS_JSON = ['src/json/node.c']
+
+SRCS_PARSER = ['src/parser/parser.c']
+
+SRCS_FILES = files(SRCS_VERSION, SRCS_UTILS, SRCS_LEXER, SRCS_JSON)
 
 #############################
 #
@@ -101,7 +105,7 @@ CFLAGS += [STACK_PROTECTOR]
 #
 #############################
 
-TEST_SUBPROJECT = ['tests/version']
+TEST_SUBPROJECT = ['tests/version', 'tests/file', 'tests/json']
 
 #############################
 #

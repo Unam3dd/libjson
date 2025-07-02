@@ -33,7 +33,7 @@ static inline json_bool_t	token_is_string(const char *str)
 	return (TRUE);
 }
 
-token_type_t	next_token(lexer_t *lexer)
+token_type_t	next_token(json_lexer_t *lexer)
 {
 	if (!lexer) return (TOKEN_ERR);
 
