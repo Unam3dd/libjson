@@ -6,27 +6,17 @@
 int main(void)
 {
 	json_ast_t	ast = { NULL, NULL, 0};
-
 	json_node_t	*first = json_node_new();
 	json_node_t	*second = json_node_new();
 	json_node_t	*third = json_node_new();
-
-	first->key = "first";
-	second->key = "second";
-	third->key = "third";
-
+	first->key = "first"; second->key = "second"; third->key = "third";
 	json_ast_node_push_back(&ast, first);
-
 	assert(ast.head == first);
-	assert(ast.head->next == NULL);
-	assert(ast.head->prev == NULL);
+	assert(ast.head->next == NULL && ast.head->prev == NULL);
 	assert(ast.tail == first);
-	assert(ast.tail->next == NULL);
-	assert(ast.tail->prev == NULL);
+	assert(ast.tail->next == NULL && ast.tail->prev == NULL);
 	assert(ast.count == 1);
-	
 	json_ast_node_push_back(&ast, second);
-
 	assert(ast.head == first);
 	assert(ast.head->next == second);
 	assert(ast.head->prev == NULL);
@@ -37,9 +27,7 @@ int main(void)
 	assert(ast.tail->prev == first);
 	assert(ast.tail->next == NULL);
 	assert(ast.count == 2);
-	
 	json_ast_node_push_back(&ast, third);
-
 	assert(ast.count == 3);
 	assert(ast.head != ast.tail);
 	assert(ast.head == first);
@@ -55,9 +43,7 @@ int main(void)
 	assert(ast.tail->prev->prev == first);
 	assert(ast.tail->prev->next == third);
 	assert(ast.tail->prev->prev->next == second);
-
 	json_ast_node_pop_back(&ast);
-
 	assert(ast.count == 2);
 	assert(ast.head != ast.tail);
 	assert(ast.head == first);
@@ -68,22 +54,14 @@ int main(void)
 	assert(ast.tail->prev->prev == NULL);
 	assert(ast.tail->prev->next == second);
 	assert(ast.tail->next == NULL);
-	
 	json_ast_node_pop_back(&ast);
-
 	assert(ast.count == 1);
 	assert(ast.head == ast.tail);
-	assert(ast.head == first);
-	assert(ast.head->next == NULL);
-	assert(ast.head->prev == NULL);
-	assert(ast.tail == first);
-	assert(ast.tail->prev == NULL);
-	assert(ast.tail->next == NULL);
-	
+	assert(ast.head == first && ast.tail == first);
+	assert(ast.head->next == NULL && ast.head->next == NULL);
+	assert(ast.tail->prev == NULL && ast.tail->next == NULL);
 	json_ast_node_pop_back(&ast);
-
 	assert(ast.count == 0);
 	assert(ast.head == ast.tail && ast.head == NULL && ast.tail == NULL);
-
 	return (0);
 }
