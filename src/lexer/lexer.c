@@ -8,64 +8,56 @@
 
 #include <string.h>
 
-///////////////////////////////////////
+/////////////////////////////////////
 //
-//             IS_STRING
 //
-//////////////////////////////////////
+//			LEXER PEEK
+//
+//
+////////////////////////////////////
 
-static inline json_bool_t	token_is_string(const char *str)
-{
-	if (!str || *str != '"')
-		return (FALSE);
-
-
-	return (!strchr(str + 1, '"') ? FALSE : TRUE);
-}
-
-token_type_t	next_token(json_lexer_t *lexer)
+json_token_type_t	lexer_peek(json_lexer_t *lexer)
 {
 	if (!lexer) return (TOKEN_ERR);
 
-	lexer->pos += strspn(lexer->buf + lexer->pos, "  \t\r\n");
-
 	switch (*(lexer->buf + lexer->pos)) {
 
-		case TOKEN_LBRACE:
-			lexer->pos++;
-			return (TOKEN_LBRACE);
+		case '{': return (TOKEN_LBRACE);
 
-		case TOKEN_RBRACE:
-			lexer->pos++;
-			return (TOKEN_RBRACE);
+		case '}': return (TOKEN_RBRACE);
 
-		case TOKEN_LBRACKET:
-			lexer->pos++;
-			return (TOKEN_LBRACKET);
+		case '[': return (TOKEN_LBRACKET);
 
-		case TOKEN_RBRACKET:
-			lexer->pos++;
-			return (TOKEN_RBRACKET);
-		
-		case TOKEN_COLON:
-			lexer->pos++;
-			return (TOKEN_COLON);
+		case ']': return (TOKEN_RBRACKET);
 
-		case TOKEN_COMMA:
-			lexer->pos++;
-			return (TOKEN_COMMA);
+		case ':': return (TOKEN_COLON);
 
-		case TOKEN_EOF:
-			return (TOKEN_EOF);
+		case ',': return (TOKEN_COMMA);
+
+		case '"': return (TOKEN_STRING);
+
+		case 0: return (TOKEN_EOF);
 
 		default:
 			break;
 	}
 
-	if (token_is_string((const char *)(lexer->buf + lexer->pos)))
-		return (TOKEN_STRING);
-	
 	return (TOKEN_ERR);
+}
+
+/////////////////////////////////////
+//
+//
+//			LEXER NEXT
+//
+//
+////////////////////////////////////
+
+json_status_t	lexer_next(json_lexer_t *lexer)
+{
+	if (!lexer) return (JSON_ERR);
+
+	return (JSON_OK);
 }
 
 ///////////////////////////////////////
@@ -74,7 +66,7 @@ token_type_t	next_token(json_lexer_t *lexer)
 //
 //////////////////////////////////////
 
-const char		*get_string_token_type(const token_type_t type)
+const char		*get_string_token_type(const json_token_type_t type)
 {
 	static const token_str_t t[] = {
 		{ TOKEN_ERR,    "TOKEN_ERR"        },

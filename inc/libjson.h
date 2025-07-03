@@ -55,7 +55,7 @@ typedef long					json_number_t;
 typedef double					json_float_number_t;
 
 typedef struct s_json_type_str_t	json_type_str_t;
-typedef struct s_token_str_t		token_str_t;
+typedef struct s_json_token_str_t		token_str_t;
 
 ///////////////////////////////////////
 //
@@ -63,7 +63,7 @@ typedef struct s_token_str_t		token_str_t;
 //
 //////////////////////////////////////
 
-typedef enum e_token_type_t {
+typedef enum e_json_token_type_t {
 	TOKEN_ERR = 0x7F,
 	TOKEN_LBRACE = '{',    	// {
 	TOKEN_RBRACE = '}',   	//  }
@@ -71,10 +71,10 @@ typedef enum e_token_type_t {
 	TOKEN_RBRACKET = ']', 	//  ]
 	TOKEN_COLON = ':', 		// :
 	TOKEN_COMMA = ',',		// ,
-	TOKEN_STRING = 1,		// String
-	TOKEN_NUMBER = 2,		// Number
+	TOKEN_STRING = '"',		// String
+	TOKEN_NUMBER = 1,		// Number
 	TOKEN_EOF = 0,			// End of file
-} token_type_t;
+} json_token_type_t;
 
 typedef enum e_json_type_t {
 	JSON_NULL,
@@ -96,10 +96,10 @@ typedef enum e_json_status_t {
 //
 //////////////////////////////////////
 
-struct s_token_str_t
+struct s_json_token_str_t
 {
-	token_type_t	type;
-	const char		*str;
+	json_token_type_t	type;
+	const char			*str;
 };
 
 struct s_json_type_str_t
@@ -110,9 +110,9 @@ struct s_json_type_str_t
 
 struct s_lexer_t
 {
-	const char	*buf;
-	size_t		pos;
-	ssize_t		size;
+	const char			*buf;
+	size_t				pos;
+	ssize_t				size;
 };
 
 struct s_json_node_t
@@ -167,8 +167,10 @@ struct s_json_parse_t
 //
 //////////////////////////////////////
 
-const char		*get_string_token_type(const token_type_t type);
-token_type_t	next_token(json_lexer_t *lexer);
+const char *get_string_token_type(const json_token_type_t type);
+
+json_token_type_t	lexer_peek(json_lexer_t *lexer);
+json_status_t		lexer_next(json_lexer_t *lexer);
 
 ///////////////////////////////////////
 //
@@ -224,10 +226,10 @@ json_status_t	json_parse(json_parse_t *p, json_lexer_t *l);
 //
 //////////////////////////////////////
 
-json_node_t		*json_node_new(void);
 
 const char  	*json_get_type_str(const json_type_t type);
 
+json_node_t		*json_node_new(void);
 json_status_t	json_ast_node_arena(json_ast_t *ast, const size_t n);
 json_status_t	json_ast_node_pop(json_ast_t *ast);
 json_status_t	json_ast_node_pop_back(json_ast_t *ast);

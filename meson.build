@@ -49,7 +49,7 @@ SRCS_VERSION = ['src/version/version.c']
 
 SRCS_UTILS = ['src/utils/file.c']
 
-SRCS_LEXER = ['src/lexer/token.c']
+SRCS_LEXER = ['src/lexer/lexer.c']
 
 SRCS_JSON = ['src/json/node.c', 'src/json/type.c']
 
