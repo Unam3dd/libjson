@@ -25,9 +25,16 @@ typedef enum e_json_bool_t
 	TRUE
 } json_bool_t;
 
+typedef enum e_json_flag_t
+{
+	BLOCK = 1 << 0,
+	ARENA = 1 << 1
+} json_flag_t;
+
 typedef struct s_lexer_t 		json_lexer_t;
 typedef json_lexer_t			json_file_t;
 typedef json_lexer_t			json_buf_t;
+
 typedef struct s_json_node_t	json_node_t;
 typedef struct s_json_parse_t	json_parse_t;
 typedef struct s_json_ast_t		json_ast_t;
@@ -47,7 +54,8 @@ typedef json_bool_t**			json_array_bool_t;
 typedef long					json_number_t;
 typedef double					json_float_number_t;
 
-typedef struct s_token_str_t	token_str_t;
+typedef struct s_json_type_str_t	json_type_str_t;
+typedef struct s_token_str_t		token_str_t;
 
 ///////////////////////////////////////
 //
@@ -94,6 +102,12 @@ struct s_token_str_t
 	const char		*str;
 };
 
+struct s_json_type_str_t
+{
+	const char		*str;
+	json_type_t		type;
+};
+
 struct s_lexer_t
 {
 	const char	*buf;
@@ -126,9 +140,11 @@ struct s_json_node_t
 
 	} value;
 
-	json_node_t	*next;
-	json_node_t	*prev;
-	json_type_t	type;
+	json_node_t			*next;
+	json_node_t			*prev;
+	json_node_t			*mptr;
+	json_flag_t			flag;
+	json_type_t			type;
 };
 
 struct s_json_ast_t
@@ -147,13 +163,6 @@ struct s_json_parse_t
 
 ///////////////////////////////////////
 //
-//            ARENA
-//
-//////////////////////////////////////
-
-
-///////////////////////////////////////
-//
 //            LEXER
 //
 //////////////////////////////////////
@@ -168,6 +177,7 @@ token_type_t	next_token(json_lexer_t *lexer);
 //////////////////////////////////////
 
 json_status_t	json_read_file(json_file_t *f, const char *filename);
+json_status_t	json_free_file(json_file_t *f);
 
 static inline json_status_t	json_read_from_string(json_buf_t *buf, const char *string, size_t size) {
 	
@@ -215,13 +225,16 @@ json_status_t	json_parse(json_parse_t *p, json_lexer_t *l);
 //////////////////////////////////////
 
 json_node_t		*json_node_new(void);
-json_node_t		*json_node_reserve(const size_t n);
+
+const char  	*json_get_type_str(const json_type_t type);
+
+json_status_t	json_ast_node_arena(json_ast_t *ast, const size_t n);
+json_status_t	json_ast_node_pop(json_ast_t *ast);
+json_status_t	json_ast_node_pop_back(json_ast_t *ast);
 json_status_t	json_ast_free_all(json_ast_t *ast);
 json_status_t	json_ast_node_push(json_ast_t *ast, json_node_t *node);
-json_status_t	json_ast_node_pop(json_ast_t *ast);
 json_status_t	json_ast_node_push_back(json_ast_t *ast, json_node_t *node);
-json_status_t	json_ast_node_pop_back(json_ast_t *ast);
 json_status_t	json_node_free(json_node_t **node);
-void			json_ast_node_show(const json_node_t *node);
+void			json_node_show(const json_node_t *node);
 
 #endif

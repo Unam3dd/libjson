@@ -16,21 +16,11 @@
 
 static inline json_bool_t	token_is_string(const char *str)
 {
-	if (!str) return (FALSE);
-	
-	char	*tmp = NULL;
-
-	if (*str != '"')
+	if (!str || *str != '"')
 		return (FALSE);
 
-	tmp = strchr(str + 1, '"');
 
-	if (!tmp)
-		return (FALSE);
-
-	//*pos = *pos + (tmp - str) + 1;
-
-	return (TRUE);
+	return (!strchr(str + 1, '"') ? FALSE : TRUE);
 }
 
 token_type_t	next_token(json_lexer_t *lexer)
@@ -95,8 +85,8 @@ const char		*get_string_token_type(const token_type_t type)
 		{ TOKEN_LBRACE, "TOKEN_LBRACE"     },
 		{ TOKEN_LBRACKET, "TOKEN_LBRACKET" },
 		{ TOKEN_RBRACKET, "TOKEN_RBRACKET" },
-		{ TOKEN_STRING, "TOKEN_STRING"     },
-		{ TOKEN_NUMBER, "TOKEN_NUMBER"     },
+		{ TOKEN_STRING,   "TOKEN_STRING"   },
+		{ TOKEN_NUMBER,   "TOKEN_NUMBER"   },
 	};
 
 	for (uint32_t i = 0; i < sizeof(t)/sizeof(token_str_t); i += 5) {

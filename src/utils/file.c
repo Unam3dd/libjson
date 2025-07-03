@@ -52,3 +52,23 @@ json_status_t	json_read_file(json_file_t *f, const char *filename)
 
 	return (JSON_OK);
 }
+
+///////////////////////////////////////
+//
+//            FREE FILE
+//
+//////////////////////////////////////
+
+json_status_t	json_free_file(json_file_t *f)
+{
+	if (!f)
+		return (JSON_ERR);
+
+	free((void*)f->buf);
+	
+	f->buf = NULL;
+	f->pos = 0;
+	f->size = 0;
+
+	return (JSON_OK);
+}

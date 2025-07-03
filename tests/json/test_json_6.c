@@ -36,5 +36,9 @@ int main(void)
 	assert(ast.tail == NULL);
 	assert(ast.count == 0);
 
+	json_node_free(&first);
+	json_node_free(&second);
+	json_node_free(&third);
+
 	return (0);
 }

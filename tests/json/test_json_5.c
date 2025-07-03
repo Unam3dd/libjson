@@ -30,6 +30,8 @@ int main(void)
 
 	assert(status == JSON_ERR);
 
+	json_node_show(first);
+
 	json_node_free(&first);
 	json_node_free(&second);
 	json_node_free(&third);

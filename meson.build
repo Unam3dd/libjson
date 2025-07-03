@@ -51,7 +51,7 @@ SRCS_UTILS = ['src/utils/file.c']
 
 SRCS_LEXER = ['src/lexer/token.c']
 
-SRCS_JSON = ['src/json/node.c']
+SRCS_JSON = ['src/json/node.c', 'src/json/type.c']
 
 SRCS_PARSER = ['src/parser/parser.c']
 
@@ -110,7 +110,7 @@ CFLAGS += [STACK_PROTECTOR]
 #
 #############################
 
-TEST_SUBPROJECT = ['tests/version', 'tests/file', 'tests/json']
+TEST_SUBPROJECT = ['tests/version', 'tests/file', 'tests/json', 'tests/lexer']
 
 #############################
 #
