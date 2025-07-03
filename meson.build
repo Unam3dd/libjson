@@ -32,7 +32,12 @@ INC_DIR = ['inc']
 
 LIBJSON_HEADERS = ['libjson.h']
 
-STD_HEADERS = ['stdio.h']
+STD_HEADERS = ['stdio.h', 
+              'stdint.h',
+              'string.h',
+              'stdlib.h',
+              'stddef.h'
+              ]
 
 #############################
 #
