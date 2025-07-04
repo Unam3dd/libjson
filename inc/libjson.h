@@ -169,8 +169,9 @@ struct s_json_parse_t
 
 const char *get_string_token_type(const json_token_type_t type);
 
+json_bool_t			token_is_number(const char *str);
 json_token_type_t	lexer_peek(json_lexer_t *lexer);
-json_status_t		lexer_next(json_lexer_t *lexer);
+json_token_type_t	lexer_next(json_lexer_t *lexer);
 
 ///////////////////////////////////////
 //

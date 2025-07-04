@@ -5,10 +5,10 @@
 #############################
 
 TEST_LEXER_SRCS = [
-  './test_lexer_1.c' 
+  './test_lexer_2.c'
   ]
 
-test_lexer_1 = executable('test_lexer_1',
+test_lexer_2 = executable('test_lexer_2',
                 files(TEST_LEXER_SRCS[0]),
                 c_args: ['-g', '-fPIC'],
                 link_with: lib,
@@ -16,5 +16,5 @@ test_lexer_1 = executable('test_lexer_1',
                 install: false,
                 pie: true)
 
-test('test lexer 1', test_lexer_1, args: ['../examples/test.json'], verbose: false, suite: ['lexer'])
+test('test lexer 2', test_lexer_2, verbose: false, suite: ['lexer'])
 

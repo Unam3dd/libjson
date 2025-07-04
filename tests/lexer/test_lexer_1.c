@@ -14,12 +14,12 @@ int main(int ac, char **av)
 
 	assert(json_read_file(&f, av[1]) == JSON_OK);
 
-	token_type_t	t = next_token(&f);
+	json_token_type_t	t = lexer_next(&f);
 
 
 	while (t != TOKEN_STRING) {
 		puts(get_string_token_type(t));
-		t = next_token(&f);
+		t = lexer_next(&f);
 	}
 
 	free((void *)f.buf);

@@ -8,6 +8,76 @@
 
 #include <string.h>
 
+///////////////////////////////////////
+//
+//            NUMBER
+//
+//////////////////////////////////////
+
+json_bool_t token_is_number(const char *str)
+{
+	if (!str || !*str)
+		return (FALSE);
+
+	const char	*tmp = str;
+	size_t	len = 0;
+
+	len = strspn(str, "-");
+
+	if (len > 1) return (FALSE);
+
+	tmp += len;
+
+	if (*tmp == '0') {
+		len = strspn(tmp, "0");
+
+		if (len > 1 || strspn(tmp + 1, "123456789") >= 1) return (FALSE);
+
+		if (*(tmp + 1) != '.')
+			tmp += len;
+
+		if (!*tmp) return (TRUE);
+	}
+
+	len = strspn(tmp, "0123456789");
+
+	if (!len) return (FALSE);
+
+	tmp += len;
+
+	if (*tmp == '.') {
+		len = strspn(tmp, ".");
+
+		if (len > 1 || !strspn(tmp + 1, "0123456789")) return (FALSE);
+
+		tmp += len;
+	}
+
+	if (*tmp == 'e' || *tmp == 'E') {
+
+		if (strspn(tmp, "eE") > 1) return (FALSE);
+
+		len = strspn(++tmp, "-+");
+
+		if (len > 1) return (FALSE);
+
+		tmp += len;
+
+		if (!strspn(tmp, "0123456789")) return (FALSE);
+
+		if (*tmp == '0') {
+			
+			if (strspn(tmp, "0") > 1) return (FALSE);
+			
+			++tmp;
+		}
+		
+		tmp += strspn(tmp, "0123456789");
+	}
+
+	return (TRUE);
+}
+
 /////////////////////////////////////
 //
 //
@@ -53,11 +123,48 @@ json_token_type_t	lexer_peek(json_lexer_t *lexer)
 //
 ////////////////////////////////////
 
-json_status_t	lexer_next(json_lexer_t *lexer)
+json_token_type_t lexer_next(json_lexer_t *lexer)
 {
-	if (!lexer) return (JSON_ERR);
+	if (!lexer)
+		return (TOKEN_ERR);
 
-	return (JSON_OK);
+	switch (*(lexer->buf + lexer->pos)) {
+
+		case '{':
+			lexer->pos++;
+			return (TOKEN_LBRACE);
+
+		case '}':
+			lexer->pos++;
+			return (TOKEN_RBRACE);
+
+		case '[':
+			lexer->pos++;
+			return (TOKEN_LBRACKET);
+
+		case ']':
+			lexer->pos++;
+			return (TOKEN_RBRACKET);
+
+		case ':':
+			lexer->pos++;
+			return (TOKEN_COLON);
+
+		case ',':
+			lexer->pos++;
+			return (TOKEN_COMMA);
+
+		case '"':
+			lexer->pos++;
+			return (TOKEN_STRING);
+
+		case 0: return (TOKEN_EOF);
+
+		default:
+			break;
+	}
+
+	return (TOKEN_ERR);
 }
 
 ///////////////////////////////////////
