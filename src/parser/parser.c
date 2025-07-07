@@ -34,8 +34,10 @@ static const char	*json_parse_string(json_lexer_t *lexer)
 	if (!tmp || (tmp && strspn(tmp, "\"") > 1))
 		return (NULL);
 
-	if (*tmp == '"')
-		*tmp = 0;
+	if (*tmp != '"')
+		return (NULL);
+	
+	*tmp = 0;
 
 	lexer->pos += (uint64_t)tmp - (uint64_t)(lexer->buf + lexer->pos) + 1;
 
