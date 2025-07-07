@@ -55,7 +55,7 @@ SRCS_JSON = ['src/json/node.c', 'src/json/type.c']
 
 SRCS_PARSER = ['src/parser/parser.c']
 
-SRCS_FILES = files(SRCS_VERSION, SRCS_UTILS, SRCS_LEXER, SRCS_JSON)
+SRCS_FILES = files(SRCS_VERSION, SRCS_UTILS, SRCS_LEXER, SRCS_JSON, SRCS_PARSER)
 
 #############################
 #
@@ -110,7 +110,7 @@ CFLAGS += [STACK_PROTECTOR]
 #
 #############################
 
-TEST_SUBPROJECT = ['tests/version', 'tests/file', 'tests/json', 'tests/lexer']
+TEST_SUBPROJECT = ['tests/version', 'tests/file', 'tests/json', 'tests/lexer', 'tests/parser']
 
 #############################
 #

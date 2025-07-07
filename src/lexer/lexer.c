@@ -10,10 +10,19 @@
 
 ///////////////////////////////////////
 //
-//            STATIC
+//            STATIC HELPERS
 //
 //////////////////////////////////////
 
+/**
+ * @brief Checks if a string contains multiple decimal points
+ * 
+ * This function validates that a string doesn't contain more than one
+ * decimal point, which would make it an invalid number format.
+ * 
+ * @param str The string to check for multiple decimal points
+ * @return TRUE if the string contains multiple decimal points, FALSE otherwise
+ */
 static json_bool_t	number_bad_dot(const char *str)
 {
 	if (!str) return (FALSE);
@@ -28,80 +37,191 @@ static json_bool_t	number_bad_dot(const char *str)
 	return (ptr && strchr(ptr, '.') ? TRUE : FALSE);
 }
 
+/**
+ * @brief Validates the integer part of a JSON number and returns its length
+ * 
+ * This function validates the integer portion of a JSON number according to
+ * JSON specification rules:
+ * - Optional minus sign
+ * - Single zero OR non-zero digit followed by any digits
+ * - Leading zeros are not allowed (except for standalone zero)
+ * 
+ * @param str Pointer to the string containing the number
+ * @return Length of the valid integer part, or 0 if invalid
+ */
+static size_t validate_integer_part(const char *str)
+{
+	if (!str || !*str) return (0);
+	
+	const char *start = str;
+	
+	// Handle optional minus sign
+	if (*str == '-') {
+		str++;
+		if (!*str) return (0); // Just a sign is not valid
+	}
+	
+	// Special case for zero
+	if (*str == '0') {
+		str++;
+		// After zero, only '.', end of string allowed - no 'e' or 'E' directly
+		if (*str && *str != '.') {
+			return (0);
+		}
+		return (str - start);
+	}
+	
+	// Numbers starting with 1-9
+	if (*str >= '1' && *str <= '9') {
+		str++;
+		// Consume all following digits
+		while (*str >= '0' && *str <= '9') {
+			str++;
+		}
+		return (str - start);
+	}
+	
+	return (0);
+}
+
+/**
+ * @brief Validates the fractional part of a JSON number and returns its length
+ * 
+ * This function validates the fractional portion of a JSON number:
+ * - Must start with a decimal point
+ * - Must be followed by at least one digit
+ * - Can contain multiple digits after the decimal point
+ * 
+ * @param str Pointer to the string at the potential decimal point
+ * @return Length of the valid fractional part (including the dot), or 0 if no fractional part
+ */
+static size_t validate_fraction_part(const char *str)
+{
+	if (!str || *str != '.') return (0); // No fractional part
+	
+	const char *start = str;
+	str++; // Skip the '.'
+	
+	// Must have at least one digit after the decimal point
+	if (!*str || *str < '0' || *str > '9') {
+		return (0);
+	}
+	
+	// Consume all digits
+	while (*str >= '0' && *str <= '9') {
+		str++;
+	}
+	
+	return (str - start);
+}
+
+/**
+ * @brief Validates the exponent part of a JSON number and returns its length
+ * 
+ * This function validates the exponent portion of a JSON number:
+ * - Must start with 'e' or 'E'
+ * - Optional '+' or '-' sign
+ * - Must be followed by at least one digit
+ * - Can contain multiple digits
+ * 
+ * @param str Pointer to the string at the potential exponent indicator
+ * @return Length of the valid exponent part, or 0 if no exponent part
+ */
+static size_t validate_exponent_part(const char *str)
+{
+	if (!str || (*str != 'e' && *str != 'E')) return (0); // No exponent
+	
+	const char *start = str;
+	str++; // Skip 'e' or 'E'
+	
+	// Optional sign
+	if (*str == '+' || *str == '-') {
+		str++;
+	}
+	
+	// Must have at least one digit
+	if (!*str || *str < '0' || *str > '9') {
+		return (0);
+	}
+	
+	// Consume all digits
+	while (*str >= '0' && *str <= '9') {
+		str++;
+	}
+	
+	return (str - start);
+}
+
 ///////////////////////////////////////
 //
-//            NUMBER
+//            NUMBER VALIDATION
 //
 //////////////////////////////////////
 
+/**
+ * @brief Validates if a string represents a valid JSON number
+ * 
+ * This function validates a string according to JSON number specification:
+ * - Must contain only valid number characters (-+0123456789eE.)
+ * - Must not contain multiple decimal points
+ * - Must have valid integer part (required)
+ * - May have valid fractional part (optional)
+ * - May have valid exponent part (optional)
+ * - Must consume the entire string
+ * 
+ * @param str The string to validate as a JSON number
+ * @return TRUE if the string is a valid JSON number, FALSE otherwise
+ */
 json_bool_t token_is_number(const char *str)
 {
-	if (!str || !*str \
-			|| strspn(str, "-+0123456789eE.") != strlen(str) ||
-			number_bad_dot(str))
+	if (!str || !*str) return (FALSE);
+	
+	// Check that string contains only valid number characters
+	if (strspn(str, "-+0123456789eE.") != strlen(str)) {
 		return (FALSE);
-
-	const char	*tmp = str;
-	size_t	len = 0;
-
-	if (*tmp == '-') {
-		if (strspn(tmp, "-") > 1) return (FALSE);
-		tmp++;
-	}
-
-	if (*tmp == '0') {
-		len = strspn(tmp, "0");
-
-		if (len > 1 || strspn(tmp + 1, "123456789") >= 1) return (FALSE);
-
-		if (tmp && *(tmp + 1) != '.')
-			tmp += len;
-
-		if (!*tmp) return (TRUE);
-	}
-
-	len = strspn(tmp, "0123456789");
-
-	if (!len) return (FALSE);
-
-	tmp += len;
-
-	if (*tmp == '.') {
-		if (strspn(tmp, ".") > 1 || !strspn(tmp + 1, "0123456789")) return (FALSE);
-
-		++tmp;
-
-		len = strspn(tmp, "0123456789");
-
-		tmp += len;
-	}
-
-	if (*tmp == 'e' || *tmp == 'E') {
-
-		if (strspn(tmp++, "eE") > 1) return (FALSE);
-
-		if (tmp && (*tmp == '-' || *tmp == '+'))
-			if (strspn(tmp++, "-+") > 1) return (FALSE);
-
-		if (!strspn(tmp, "0123456789"))
-			return (FALSE);
-
-		if (*tmp == '0') if (strspn(tmp++, "0") > 1) return (FALSE);
 	}
 	
-	tmp += strspn(tmp, "0123456789");
-
-	return (!*tmp);
+	// Check that there are no multiple decimal points
+	if (number_bad_dot(str)) {
+		return (FALSE);
+	}
+	
+	const char *current = str;
+	size_t len;
+	
+	// Validate integer part (required)
+	len = validate_integer_part(current);
+	if (len == 0) return (FALSE);
+	current += len;
+	
+	// Validate fractional part (optional)
+	len = validate_fraction_part(current);
+	current += len;
+	
+	// Validate exponent part (optional)
+	len = validate_exponent_part(current);
+	current += len;
+	
+	// Check that we consumed the entire string
+	return (*current == '\0');
 }
 
-/////////////////////////////////////
+///////////////////////////////////////
 //
+//            LEXER OPERATIONS
 //
-//			LEXER PEEK
-//
-//
-////////////////////////////////////
+//////////////////////////////////////
 
+/**
+ * @brief Peeks at the current token without advancing the lexer position
+ * 
+ * This function examines the character at the current lexer position and
+ * returns the corresponding token type without modifying the lexer state.
+ * Used for lookahead operations in parsing.
+ * 
+ * @param lexer Pointer to the lexer structure
+ * @return The token type at the current position, or TOKEN_ERR if invalid
+ */
 json_token_type_t	lexer_peek(json_lexer_t *lexer)
 {
 	if (!lexer) return (TOKEN_ERR);
@@ -128,21 +248,28 @@ json_token_type_t	lexer_peek(json_lexer_t *lexer)
 			break;
 	}
 
+	if (token_is_number(lexer->buf + lexer->pos))
+		return (TOKEN_NUMBER);
+
 	return (TOKEN_ERR);
 }
 
-/////////////////////////////////////
-//
-//
-//			LEXER NEXT
-//
-//
-////////////////////////////////////
-
+/**
+ * @brief Gets the next token and advances the lexer position
+ * 
+ * This function examines the character at the current lexer position,
+ * returns the corresponding token type, and advances the lexer position
+ * by one character. This is the main tokenization function.
+ * 
+ * @param lexer Pointer to the lexer structure
+ * @return The token type at the current position, or TOKEN_ERR if invalid
+ */
 json_token_type_t lexer_next(json_lexer_t *lexer)
 {
 	if (!lexer)
 		return (TOKEN_ERR);
+
+	lexer->pos += strspn((char *)(lexer->buf + lexer->pos), " \t\r\n");
 
 	switch (*(lexer->buf + lexer->pos)) {
 
@@ -180,15 +307,28 @@ json_token_type_t lexer_next(json_lexer_t *lexer)
 			break;
 	}
 
+	if (token_is_number(lexer->buf + lexer->pos))
+		return (TOKEN_NUMBER);
+
 	return (TOKEN_ERR);
 }
 
 ///////////////////////////////////////
 //
-//           PRINT TOKEN TYPE
+//           TOKEN UTILITIES
 //
 //////////////////////////////////////
 
+/**
+ * @brief Converts a token type enum to its string representation
+ * 
+ * This function provides a string representation of token types for
+ * debugging and error reporting purposes. Uses an optimized lookup
+ * with loop unrolling for better performance.
+ * 
+ * @param type The token type enum to convert
+ * @return String representation of the token type, or NULL if not found
+ */
 const char		*get_string_token_type(const json_token_type_t type)
 {
 	static const token_str_t t[] = {
@@ -204,6 +344,7 @@ const char		*get_string_token_type(const json_token_type_t type)
 		{ TOKEN_NUMBER,   "TOKEN_NUMBER"   },
 	};
 
+	// Loop unrolling for better performance
 	for (uint32_t i = 0; i < sizeof(t)/sizeof(token_str_t); i += 5) {
 
 		if (t[i].type == type)
