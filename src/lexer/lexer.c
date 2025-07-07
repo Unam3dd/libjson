@@ -36,23 +36,18 @@ static json_bool_t	number_bad_dot(const char *str)
 
 json_bool_t token_is_number(const char *str)
 {
-	if (!str || !*str)
-		return (FALSE);
-
-	if (strspn(str, "-+0123456789eE.") != strlen(str))
-		return (FALSE);
-
-	if (number_bad_dot(str))
+	if (!str || !*str \
+			|| strspn(str, "-+0123456789eE.") != strlen(str) ||
+			number_bad_dot(str))
 		return (FALSE);
 
 	const char	*tmp = str;
 	size_t	len = 0;
 
-	len = strspn(str, "-");
-
-	if (len > 1) return (FALSE);
-
-	tmp += len;
+	if (*tmp == '-') {
+		if (strspn(tmp, "-") > 1) return (FALSE);
+		tmp++;
+	}
 
 	if (*tmp == '0') {
 		len = strspn(tmp, "0");
@@ -72,36 +67,31 @@ json_bool_t token_is_number(const char *str)
 	tmp += len;
 
 	if (*tmp == '.') {
-		len = strspn(tmp, ".");
+		if (strspn(tmp, ".") > 1 || !strspn(tmp + 1, "0123456789")) return (FALSE);
 
-		if (len > 1 || !strspn(tmp + 1, "0123456789")) return (FALSE);
+		++tmp;
+
+		len = strspn(tmp, "0123456789");
 
 		tmp += len;
 	}
 
 	if (*tmp == 'e' || *tmp == 'E') {
 
-		if (strspn(tmp, "eE") > 1) return (FALSE);
+		if (strspn(tmp++, "eE") > 1) return (FALSE);
 
-		len = strspn(++tmp, "-+");
+		if (tmp && (*tmp == '-' || *tmp == '+'))
+			if (strspn(tmp++, "-+") > 1) return (FALSE);
 
-		if (len > 1) return (FALSE);
+		if (!strspn(tmp, "0123456789"))
+			return (FALSE);
 
-		tmp += len;
-
-		if (!strspn(tmp, "0123456789")) return (FALSE);
-
-		if (*tmp == '0') {
-			
-			if (strspn(tmp, "0") > 1) return (FALSE);
-			
-			++tmp;
-		}
-		
-		tmp += strspn(tmp, "0123456789");
+		if (*tmp == '0') if (strspn(tmp++, "0") > 1) return (FALSE);
 	}
+	
+	tmp += strspn(tmp, "0123456789");
 
-	return (TRUE);
+	return (!*tmp);
 }
 
 /////////////////////////////////////
