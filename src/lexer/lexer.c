@@ -10,6 +10,26 @@
 
 ///////////////////////////////////////
 //
+//            STATIC
+//
+//////////////////////////////////////
+
+static json_bool_t	number_bad_dot(const char *str)
+{
+	if (!str) return (FALSE);
+
+	char	*ptr = strchr(str, '.');
+
+	if (!ptr)
+		return (FALSE);
+
+	++ptr;
+
+	return (ptr && strchr(ptr, '.') ? TRUE : FALSE);
+}
+
+///////////////////////////////////////
+//
 //            NUMBER
 //
 //////////////////////////////////////
@@ -17,6 +37,12 @@
 json_bool_t token_is_number(const char *str)
 {
 	if (!str || !*str)
+		return (FALSE);
+
+	if (strspn(str, "-+0123456789eE.") != strlen(str))
+		return (FALSE);
+
+	if (number_bad_dot(str))
 		return (FALSE);
 
 	const char	*tmp = str;
@@ -33,7 +59,7 @@ json_bool_t token_is_number(const char *str)
 
 		if (len > 1 || strspn(tmp + 1, "123456789") >= 1) return (FALSE);
 
-		if (*(tmp + 1) != '.')
+		if (tmp && *(tmp + 1) != '.')
 			tmp += len;
 
 		if (!*tmp) return (TRUE);
