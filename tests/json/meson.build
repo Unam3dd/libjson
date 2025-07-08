@@ -12,7 +12,6 @@ TEST_JSON_SRCS = [
   './test_json_5.c',
   './test_json_6.c',
   './test_json_7.c',
-  './test_json_8.c',
   './test_json_9.c',
   './test_json_10.c',
   './test_json_11.c',
@@ -79,7 +78,8 @@ test_json_7 = executable('test_json_7',
                 install: false,
                 pie: true)
 
-test_json_8 = executable('test_json_8',
+
+test_json_9 = executable('test_json_9',
                 files(TEST_JSON_SRCS[7]),
                 c_args: ['-g', '-fPIC'],
                 link_with: lib,
@@ -87,17 +87,8 @@ test_json_8 = executable('test_json_8',
                 install: false,
                 pie: true)
 
-
-test_json_9 = executable('test_json_9',
-                files(TEST_JSON_SRCS[8]),
-                c_args: ['-g', '-fPIC'],
-                link_with: lib,
-                include_directories: ['../../inc/', '.'],
-                install: false,
-                pie: true)
-
 test_json_10 = executable('test_json_10',
-                files(TEST_JSON_SRCS[9]),
+                files(TEST_JSON_SRCS[8]),
                 c_args: ['-g', '-fPIC'],
                 link_with: lib,
                 include_directories: ['../../inc/', '.'],
@@ -106,7 +97,7 @@ test_json_10 = executable('test_json_10',
 
 
 test_json_11 = executable('test_json_11',
-                files(TEST_JSON_SRCS[10]),
+                files(TEST_JSON_SRCS[9]),
                 c_args: ['-g', '-fPIC'],
                 link_with: lib,
                 include_directories: ['../../inc/', '.'],
@@ -114,7 +105,7 @@ test_json_11 = executable('test_json_11',
                 pie: true)
 
 test_json_12 = executable('test_json_12',
-                files(TEST_JSON_SRCS[11]),
+                files(TEST_JSON_SRCS[10]),
                 c_args: ['-g', '-fPIC'],
                 link_with: lib,
                 include_directories: ['../../inc/', '.'],
@@ -122,7 +113,7 @@ test_json_12 = executable('test_json_12',
                 pie: true)
 
 test_json_13 = executable('test_json_13',
-                files(TEST_JSON_SRCS[12]),
+                files(TEST_JSON_SRCS[11]),
                 c_args: ['-g', '-fPIC'],
                 link_with: lib,
                 include_directories: ['../../inc/', '.'],
@@ -136,7 +127,6 @@ test('test json 4', test_json_4, verbose: false, suite: ['json'])
 test('test json 5', test_json_5, verbose: false, suite: ['json'])
 test('test json 6', test_json_6, verbose: false, suite: ['json'])
 test('test json 7', test_json_7, verbose: false, suite: ['json'])
-test('test json 8', test_json_8, verbose: false, suite: ['json'])
 test('test json 9', test_json_9, verbose: false, suite: ['json'])
 test('test json 10', test_json_10, verbose: false, suite: ['json'])
 test('test json 11', test_json_11, verbose: false, suite: ['json'])
