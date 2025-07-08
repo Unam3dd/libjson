@@ -57,15 +57,20 @@ static size_t validate_integer_part(const char *str)
 	
 	// Handle optional minus sign
 	if (*str == '-') {
+		
 		str++;
+		
 		if (!*str) return (0); // Just a sign is not valid
 	}
 	
 	// Special case for zero
 	if (*str == '0') {
+		
 		str++;
+		
 		// After zero, only '.', end of string allowed - no 'e' or 'E' directly
 		if (*str && *str != '.') return (0);
+		
 		return (str - start);
 	}
 	
@@ -97,17 +102,15 @@ static size_t validate_fraction_part(const char *str)
 	if (!str || *str != '.') return (0); // No fractional part
 	
 	const char *start = str;
+	
 	str++; // Skip the '.'
 	
 	// Must have at least one digit after the decimal point
 	if (!*str || *str < '0' || *str > '9') {
 		return (0);
 	}
-	
-	// Consume all digits
-	while (*str >= '0' && *str <= '9') {
-		str++;
-	}
+
+	str += strspn(str, "0123456789");
 	
 	return (str - start);
 }
@@ -126,25 +129,19 @@ static size_t validate_fraction_part(const char *str)
  */
 static size_t validate_exponent_part(const char *str)
 {
-	if (!str || (*str != 'e' && *str != 'E')) return (0); // No exponent
+	if (!str || (*str != 'e' && *str != 'E')) return (0);
 	
 	const char *start = str;
 	str++; // Skip 'e' or 'E'
 	
 	// Optional sign
-	if (*str == '+' || *str == '-') {
+	if (*str == '+' || *str == '-')
 		str++;
-	}
 	
 	// Must have at least one digit
-	if (!*str || *str < '0' || *str > '9') {
-		return (0);
-	}
-	
-	// Consume all digits
-	while (*str >= '0' && *str <= '9') {
-		str++;
-	}
+	if (!*str || *str < '0' || *str > '9') return (0);
+
+	str += strspn(str, "0123456789");
 	
 	return (str - start);
 }
@@ -171,24 +168,18 @@ static size_t validate_exponent_part(const char *str)
  */
 json_bool_t token_is_number(const char *str)
 {
-	if (!str || !*str) return (FALSE);
-	
-	// Check that string contains only valid number characters
-	if (strspn(str, "-+0123456789eE.") != strlen(str)) {
+	if (!str 
+		|| !*str 
+		|| strspn(str, "-+0123456789eE.") != strlen(str) 
+		|| number_bad_dot(str))
 		return (FALSE);
-	}
-	
-	// Check that there are no multiple decimal points
-	if (number_bad_dot(str)) {
-		return (FALSE);
-	}
 	
 	const char *current = str;
-	size_t len;
+	size_t len = validate_integer_part(current);
 	
-	// Validate integer part (required)
-	len = validate_integer_part(current);
-	if (len == 0) return (FALSE);
+	if (len == 0)
+		return (FALSE);
+	
 	current += len;
 	
 	// Validate fractional part (optional)
@@ -200,7 +191,7 @@ json_bool_t token_is_number(const char *str)
 	current += len;
 	
 	// Check that we consumed the entire string
-	return (*current == '\0');
+	return (!*current);
 }
 
 ///////////////////////////////////////
