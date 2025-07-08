@@ -65,19 +65,16 @@ static size_t validate_integer_part(const char *str)
 	if (*str == '0') {
 		str++;
 		// After zero, only '.', end of string allowed - no 'e' or 'E' directly
-		if (*str && *str != '.') {
-			return (0);
-		}
+		if (*str && *str != '.') return (0);
 		return (str - start);
 	}
 	
 	// Numbers starting with 1-9
 	if (*str >= '1' && *str <= '9') {
-		str++;
+		
 		// Consume all following digits
-		while (*str >= '0' && *str <= '9') {
-			str++;
-		}
+		str += strspn(str, "0123456789");
+		
 		return (str - start);
 	}
 	
