@@ -21,7 +21,7 @@
 
 static const char	*json_parse_string(json_lexer_t *lexer)
 {
-	if (!lexer || !lexer->size) return (NULL);
+	if (!lexer || !lexer->size || !lexer->buf) return (NULL);
 
 	char *tmp = (char *)(lexer->buf + lexer->pos);
 	char *save = tmp;
@@ -29,12 +29,9 @@ static const char	*json_parse_string(json_lexer_t *lexer)
 	if (tmp && *tmp == '"')
 		tmp++;
 
-	tmp = strchr((char *)lexer->buf + lexer->pos, '"');
+	tmp = strchr((char *)(lexer->buf + lexer->pos), '"');
 
-	if (!tmp || (tmp && strspn(tmp, "\"") > 1))
-		return (NULL);
-
-	if (*tmp != '"')
+	if (!tmp || (tmp && strspn(tmp, "\"") > 1) || *tmp != '"')
 		return (NULL);
 	
 	*tmp = 0;
